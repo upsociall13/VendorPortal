@@ -200,8 +200,10 @@ export function generate100Vendors(existingVendors: VendorProfile[]): VendorProf
     } while (existingIds.has(id));
     existingIds.add(id);
 
-    // 6. Verification Statuses (80% verified, 20% pending)
-    const isVerified = random() < 0.8;
+    // 6. Verification Statuses (70% verified, 20% pending, 10% flagged)
+    const rVal = random();
+    const isFlagged = rVal < 0.15; // 15% flagged
+    const isVerified = !isFlagged && rVal < 0.85; // 70% verified, remainder pending
 
     // DOB
     const birthYear = Math.floor(1975 + random() * 25);
@@ -238,6 +240,30 @@ export function generate100Vendors(existingVendors: VendorProfile[]): VendorProf
       });
     }
 
+    // Calculate a credit score (0-1000) based on compliance status and loan history
+    let creditScore = 500;
+    if (isFlagged) {
+      creditScore = Math.floor(180 + random() * 150); // 180 - 330 (Poor / High Risk)
+    } else {
+      switch (loanStatus) {
+        case 'approved':
+          creditScore = Math.floor(820 + random() * 140); // 820 - 960 (Excellent)
+          break;
+        case 'under_review':
+          creditScore = Math.floor(720 + random() * 100); // 720 - 820 (Very Good)
+          break;
+        case 'applied':
+          creditScore = Math.floor(660 + random() * 80);  // 660 - 740 (Good)
+          break;
+        case 'eligible':
+          creditScore = Math.floor(600 + random() * 120); // 600 - 720 (Fair)
+          break;
+        default:
+          creditScore = Math.floor(520 + random() * 110); // 520 - 630 (Regular / Establishing)
+          break;
+      }
+    }
+
     baseList.push({
       id,
       name,
@@ -248,6 +274,8 @@ export function generate100Vendors(existingVendors: VendorProfile[]): VendorProf
       location: { lat, lng, address },
       vendingType: category.vendingType,
       isVerified,
+      isFlagged,
+      creditScore,
       dob,
       activeSchemes,
       loanStatus,

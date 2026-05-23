@@ -17,9 +17,11 @@ export interface ActivityLog {
 export interface VendorProfile {
   id?: string;
   name: string;
+  businessName?: string;
   mobile: string;
   aadharNumber: string;
   businessType: string;
+  panCardNumber?: string;
   profession?: string;
   location: {
     lat: number;
@@ -28,6 +30,8 @@ export interface VendorProfile {
   };
   vendingType: 'fixed' | 'mobile' | 'seasonal';
   isVerified: boolean;
+  isFlagged?: boolean;
+  creditScore?: number;
   selfie?: string;
   aadharScan?: string;
   dob?: string;

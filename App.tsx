@@ -36,6 +36,7 @@ const INITIAL_VENDORS: VendorProfile[] = [
     dob: "12/04/1985",
     activeSchemes: ["PM SVANidhi (Assam First)", "Mukhyamantri Vyapari Suraksha Bima"],
     loanStatus: "approved",
+    creditScore: 890,
     selfie: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300&h=300",
     aadharScan: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=300&h=300",
     activityHistory: [
@@ -49,13 +50,14 @@ const INITIAL_VENDORS: VendorProfile[] = [
     mobile: "9864098765",
     aadharNumber: "453288112233",
     businessType: "ক্ষুদ্ৰ উদ্যোগ (MSME/Small Scale)",
-    profession: "বয়ন শিল্পী (Textiles Weaver)",
+    profession: "বয়ন শিল্পী (Textiles Weaver)",
     location: { lat: 26.6338, lng: 92.7926, address: "Chowk Bazaar, Tezpur, Sonitpur" },
     vendingType: "fixed",
     isVerified: true,
     dob: "25/08/1990",
     activeSchemes: ["Mukhyamantri Atmanirbhar Asom", "SVAYEM Scheme"],
     loanStatus: "under_review",
+    creditScore: 745,
     selfie: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300&h=300",
     aadharScan: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=300&h=300",
     activityHistory: [
@@ -76,6 +78,7 @@ const INITIAL_VENDORS: VendorProfile[] = [
     dob: "15/08/1987",
     activeSchemes: ["Mukhyamantri Vyapari Suraksha Bima"],
     loanStatus: "none",
+    creditScore: 615,
     selfie: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300&h=300",
     aadharScan: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=300&h=300",
     activityHistory: [
@@ -95,6 +98,7 @@ const INITIAL_VENDORS: VendorProfile[] = [
     dob: "10/11/1993",
     activeSchemes: ["PM SVANidhi (Assam First)"],
     loanStatus: "eligible",
+    creditScore: 685,
     selfie: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300&h=300",
     aadharScan: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=300&h=300",
     activityHistory: [
@@ -106,7 +110,7 @@ const INITIAL_VENDORS: VendorProfile[] = [
     name: "জিতুল গগৈ (Jitul Gogoi)",
     mobile: "9101234567",
     aadharNumber: "331122558800",
-    businessType: "ठेলা গাড়ী (Mobile Cart)",
+    businessType: "ठेला গাড়ী (Mobile Cart)",
     profession: "বাঁহ-বেতৰ সামগ্ৰী (Bamboo Crafts Seller)",
     location: { lat: 27.4728, lng: 94.9125, address: "Dibrugarh Chowk, Dibrugarh" },
     vendingType: "mobile",
@@ -114,6 +118,7 @@ const INITIAL_VENDORS: VendorProfile[] = [
     dob: "05/02/1996",
     activeSchemes: [],
     loanStatus: "none",
+    creditScore: 535,
     selfie: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300&h=300",
     aadharScan: "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=300&h=300",
     activityHistory: [

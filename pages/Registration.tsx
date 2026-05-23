@@ -26,9 +26,11 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
 
   const [profile, setProfile] = useState<Partial<VendorProfile>>({
     name: '',
+    businessName: '',
     mobile: '',
     aadharNumber: '',
     businessType: '',
+    panCardNumber: '',
     profession: '',
     vendingType: 'fixed',
     location: { lat: 0, lng: 0, address: '' },
@@ -235,9 +237,11 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
         if (result && result.success) {
           const finalProfile: VendorProfile = { 
             name: profile.name || '',
+            businessName: profile.businessName || '',
             mobile: mobile,
             aadharNumber: profile.aadharNumber || '',
             businessType: profile.businessType || '',
+            panCardNumber: profile.panCardNumber || '',
             profession: profile.profession || '',
             location: profile.location || { lat: 0, lng: 0, address: '' },
             vendingType: profile.vendingType || 'fixed',
@@ -248,6 +252,7 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
             id: `ASM-${Math.random().toString(36).substring(2, 11).toUpperCase()}`,
             activeSchemes: ['PM SVANidhi'],
             loanStatus: 'eligible' as const,
+            creditScore: 650,
             activityHistory: [{ 
               date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }), 
               action: 'Registration Completed via DPI Portal' 
@@ -461,6 +466,19 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
 
                       <div>
                         <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-1">
+                          {t('ব্যৱসায়ৰ নাম', 'Business Name', 'व्यवसाय का नाम')}
+                        </label>
+                        <input 
+                          type="text"
+                          placeholder={t("ব্যৱসায়ৰ নাম লিখক", "Enter Business Name", "व्यवसाय का नाम दर्ज करें")}
+                          className="w-full p-4 sm:p-5 bg-gray-50 border-3 border-transparent rounded-[20px] focus:bg-white focus:border-orange-500 transition-all font-bold text-base sm:text-lg shadow-sm"
+                          value={profile.businessName}
+                          onChange={(e) => setProfile({...profile, businessName: e.target.value})}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-1">
                           {t('আধাৰ সংখ্যা', 'Aadhaar Number', 'आधार संख्या')}
                         </label>
                         <input 
@@ -490,14 +508,18 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
 
                         <div>
                           <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-1">
-                            {t('আধাৰৰ জন্ম তাৰিখ', 'DOB on Aadhaar', 'आधार जन्म तिथि')}
+                            {t('পেন কাৰ্ড নম্বৰ', 'PAN CARD Number', 'पैन कार्ड नंबर')}
                           </label>
                           <input 
                             type="text"
-                            placeholder="DD/MM/YYYY"
-                            className="w-full p-4 sm:p-5 bg-gray-50 border-3 border-transparent rounded-[20px] focus:bg-white focus:border-orange-500 transition-all font-bold text-sm sm:text-base shadow-sm"
-                            value={profile.dob || ''}
-                            onChange={(e) => setProfile({...profile, dob: e.target.value})}
+                            maxLength={10}
+                            placeholder="ABCDE1234F"
+                            className="w-full p-4 sm:p-5 bg-gray-50 border-3 border-transparent rounded-[20px] focus:bg-white focus:border-orange-500 transition-all font-bold text-sm sm:text-base font-mono uppercase tracking-wider shadow-sm"
+                            value={profile.panCardNumber || ''}
+                            onChange={(e) => {
+                              const val = e.target.value.toUpperCase().slice(0, 10);
+                              setProfile({...profile, panCardNumber: val, dob: val});
+                            }}
                           />
                         </div>
                       </div>
@@ -550,8 +572,8 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
 
                     <button 
                       onClick={() => {
-                        if(!profile.name || !profile.aadharNumber || profile.aadharNumber.length < 12 || !profile.businessType) {
-                          setError(t('অনুগ্ৰহ কৰি আধাৰ আৰু সকলো অপৰিহাৰ্য তথ্য পূৰণ কৰক।', 'Please fill Aadhaar and all mandatory fields.', 'कृपया आधार और सभी अनिवार्य विवरण भरें।'));
+                        if(!profile.name || !profile.businessName || !profile.aadharNumber || profile.aadharNumber.length < 12 || !profile.businessType) {
+                          setError(t('অনুগ্ৰহ কৰি ব্যৱসায়ৰ নাম আৰু আটাইকেইটা অপৰিহাৰ্য তথ্য পূৰণ কৰক।', 'Please fill Business Name and all mandatory fields.', 'कृपया व्यवसाय का नाम और सभी अनिवार्य विवरण भरें।'));
                         } else {
                           setError(null);
                           setStep(RegistrationStep.VERIFY_IDENTITY);

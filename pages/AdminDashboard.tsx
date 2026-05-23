@@ -109,6 +109,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
         return { 
           ...v, 
           isVerified: nextVerified,
+          isFlagged: false, // clear flagged state when toggled
           activityHistory: newHistory,
           // Grant schemes pre-approval on verification if appropriate
           loanStatus: nextVerified && v.loanStatus === 'none' ? 'eligible' : v.loanStatus
@@ -120,12 +121,64 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
     
     // Also update current inspected modal if open
     if (activeInspectorVendor && activeInspectorVendor.id === vendorId) {
+       setActiveInspectorVendor(prev => {
+         if (!prev) return null;
+         return { 
+           ...prev, 
+           isVerified: !prev.isVerified,
+           isFlagged: false,
+           loanStatus: !prev.isVerified && prev.loanStatus === 'none' ? 'eligible' : prev.loanStatus
+         };
+       });
+    }
+  };
+
+  // Direct 3-way compliance state update
+  const handleUpdateVerificationStatus = (vendorId: string, status: 'verified' | 'pending' | 'flagged') => {
+    const updated = vendors.map(v => {
+      if (v.id === vendorId) {
+        let textStatus = '';
+        if (status === 'verified') textStatus = 'Approved & Verified manually by Municipality Officer';
+        if (status === 'pending') textStatus = 'Registration Put On Hold/Pending';
+        if (status === 'flagged') textStatus = 'Vendor flagged for compliance violations / non-compliance';
+
+        const newHistory = [
+          {
+            date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            action: textStatus
+          },
+          ...(v.activityHistory || [])
+        ];
+
+        showToast(
+          status === 'verified'
+            ? `${v.name || 'Vendor'} is now Verified and Certificate is Active!`
+            : status === 'flagged'
+            ? `Warning: ${v.name || 'Vendor'} has been flagged for non-compliance.`
+            : `${v.name || 'Vendor'} verification status set to Pending.`,
+          status === 'verified' ? 'success' : status === 'flagged' ? 'error' : 'info'
+        );
+
+        return {
+          ...v,
+          isVerified: status === 'verified',
+          isFlagged: status === 'flagged',
+          activityHistory: newHistory,
+          loanStatus: status === 'verified' && v.loanStatus === 'none' ? 'eligible' : v.loanStatus
+        };
+      }
+      return v;
+    });
+    setVendors(updated);
+
+    if (activeInspectorVendor && activeInspectorVendor.id === vendorId) {
       setActiveInspectorVendor(prev => {
         if (!prev) return null;
-        return { 
-          ...prev, 
-          isVerified: !prev.isVerified,
-          loanStatus: !prev.isVerified && prev.loanStatus === 'none' ? 'eligible' : prev.loanStatus
+        return {
+          ...prev,
+          isVerified: status === 'verified',
+          isFlagged: status === 'flagged',
+          loanStatus: status === 'verified' && prev.loanStatus === 'none' ? 'eligible' : prev.loanStatus
         };
       });
     }
@@ -216,8 +269,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
 
     const matchesStatus = 
       selectedStatus === 'all' ||
-      (selectedStatus === 'verified' && v.isVerified) ||
-      (selectedStatus === 'pending' && !v.isVerified);
+      (selectedStatus === 'verified' && v.isVerified && !v.isFlagged) ||
+      (selectedStatus === 'pending' && !v.isVerified && !v.isFlagged) ||
+      (selectedStatus === 'flagged' && v.isFlagged);
 
     const matchesDistrict = 
       selectedDistrict === '' || 
@@ -597,7 +651,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
                   </div>
                   <div className="mt-5 pt-3.5 border-t border-gray-50 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
                     <span>{t('উপাৰ্জনৰ ক্ষমতা সূচক', 'Velocity score: 9.4/10')}</span>
-                    <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded">+14.2% MoM</span>
+                    <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded font-mono">+14.2% MoM</span>
                   </div>
                 </div>
 
@@ -615,7 +669,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
                       {estimatedLivelihoodsSupported.toLocaleString('en-IN')}
                     </p>
                     <p className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wide">
-                      {t('পৰিয়ালৰ লোক লাভান্বিত:', 'Family Beneficiaries Estimated:')} <span className="text-blue-600 font-black">{Math.round(estimatedLivelihoodsSupported * 3.4)} {t('ব্যক্তি', 'Members')}</span>
+                      {t('পৰিয়ালৰ লোক লাভান্বিত:', 'Family Beneficiaries Estimated:')} <span className="text-blue-600 font-black">{Math.round(estimatedLivelihoodsSupported * 3.4)} {t('ব্যক্তি', 'Members')}</span>
                     </p>
                   </div>
                   <div className="mt-5 pt-3.5 border-t border-gray-50 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
@@ -638,16 +692,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
                       ₹{creditEnabledAmount.toLocaleString('en-IN')}
                     </p>
                     <p className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wide">
-                      {t('পিএম স্বনিধি আৰু ৰাজ্যিক সাহায্য', 'PM SVANidhi Micro Credit leverage')}
+                      {t('ঋণ সাহায্য পোৱা ব্যৱসায়ী:', 'Credit-Assisted Vendors:')} <span className="text-emerald-600 font-black">{vendors.filter(v => v.loanStatus && v.loanStatus !== 'none').length} {t('ব্যৱসায়ী', 'Vendors')}</span>
                     </p>
                   </div>
                   <div className="mt-5 pt-3.5 border-t border-gray-50 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
-                    <span>{t('ঋণ বিতৰণৰ হাৰ', 'Disbursement status')}</span>
-                    <span className="text-emerald-600 bg-emerald-50 px-2 rounded font-mono">92% OK</span>
+                    <span>{t('ঋণ আৰু ৰাজসাহায্য', 'Subsidy leverage factor')}</span>
+                    <span className="text-emerald-600 bg-emerald-50 px-2 rounded font-bold">1.4x Govt leverage</span>
                   </div>
                 </div>
 
-                {/* CARD 4: WOMEN SELF RELIANCE RATE */}
+                {/* CARD 4: REGISTERED WOMEN BUSINESS NODES */}
                 <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-5 opacity-5 text-purple-600 group-hover:scale-110 transition-transform duration-500">
                     <Sparkles className="w-24 h-24" />
@@ -655,18 +709,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
                   <div>
                     <div className="flex items-center space-x-2 text-[9px] font-black text-purple-600 uppercase tracking-widest leading-none mb-3">
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                      <span>{t('মহিলা আত্মনিৰ্ভৰশীলতা', 'Women-Owned Enterprise Ratio', 'महिला स्वावलंबन')}</span>
+                      <span>{t('পঞ্জীভুক্ত মহিলা উদ্যমী', 'Registered Women Entrepreneurs', 'पंजीकृत महिला उद्यमी')}</span>
                     </div>
                     <p className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none mb-1.5">
-                      {Math.round((womenOwnedCount / totalCount) * 100)}%
+                      {womenOwnedCount} {t('গৰাকী কৰ্মী', 'Women Nodes')}
                     </p>
                     <p className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wide">
-                      {womenOwnedCount} {t('সক্ৰিয় মহিলা কৰ্মী', 'Registered Women Business Nodes', 'महिला उद्यमी')}
+                      {t('মহিলা নিয়োজিত হাৰ:', 'Female ownership share:')} <span className="text-purple-600 font-black">{((womenOwnedCount / Math.max(1, totalCount)) * 100).toFixed(1)}%</span>
                     </p>
                   </div>
                   <div className="mt-5 pt-3.5 border-t border-gray-50 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
                     <span>{t('মহিলা সবলীকৰণ', 'Empowerment quotient')}</span>
-                    <span className="text-purple-600 font-bold">State High</span>
+                    <span className="text-purple-600 bg-purple-50 px-2 rounded font-bold">State High</span>
                   </div>
                 </div>
 
@@ -674,15 +728,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
                 <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-5 opacity-5 text-sky-600 group-hover:scale-110 transition-transform duration-500">
                     <Globe className="w-24 h-24" />
-                        <div className="mt-5 pt-3.5 border-t border-gray-50 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
-                    <span>{t('বিত্তীয় অন্তৰ্ভুক্তি', 'Financial integration')}</span>
-                    <span className="text-indigo-600 bg-indigo-50 px-2 rounded font-bold">ADVANCED</span>
                   </div>
-                </div>50 flex items-center justify-between text-[10px] font-black uppercase text-gray-500">
-                    <span>{t('বিত্তীয় অন্তৰ্ভুক্তি', 'Financial integration')}</span>
-                    <span className="text-indigo-600 bg-indigo-50 px-2 rounded font-bold">ADVANCED</span>
-                  </div>
-                </div>�र')}</span>
+                  <div>
+                    <div className="flex items-center space-x-2 text-[9px] font-black text-sky-600 uppercase tracking-widest leading-none mb-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                      <span>{t('পৰ্যটন সংযোগ', 'Tourism Impact Sector', 'पर्यटन आर्थिक क्षेत्र')}</span>
                     </div>
                     <p className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none mb-1.5">
                       {tourismImpactCount} {t('ব্যৱসায়ী', 'Cluster Nodes')}
@@ -1180,6 +1230,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
                       >
                         {t('Pending', 'Pending', 'लंबित')}
                       </button>
+                      <button 
+                        onClick={() => setSelectedStatus('flagged')}
+                        className={`px-4 py-2.5 rounded-lg transition-all cursor-pointer ${selectedStatus === 'flagged' ? 'bg-red-500 text-white shadow-sm' : 'hover:text-red-700'}`}
+                      >
+                        {t('Flagged', 'Flagged', 'चिह्नित')}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1436,16 +1492,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
                                 <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded uppercase">
                                   {vendor.profession || 'General Trade'}
                                 </span>
+                                <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase ${
+                                  (vendor.creditScore !== undefined ? vendor.creditScore : (vendor.isFlagged ? 240 : 650)) >= 800 
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                                    : (vendor.creditScore !== undefined ? vendor.creditScore : (vendor.isFlagged ? 240 : 650)) >= 700 
+                                    ? 'bg-blue-50 text-blue-700 border border-blue-100'
+                                    : (vendor.creditScore !== undefined ? vendor.creditScore : (vendor.isFlagged ? 240 : 650)) >= 500
+                                    ? 'bg-amber-50 text-amber-700 border border-amber-100'
+                                    : 'bg-rose-50 text-rose-700 border border-rose-100'
+                                }`}>
+                                  Score: {vendor.creditScore !== undefined ? vendor.creditScore : (vendor.isFlagged ? 240 : 650)}
+                                </span>
                               </div>
                             </div>
                           </div>
 
                           <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            vendor.isVerified 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-orange-100 text-orange-800'
+                            vendor.isFlagged
+                              ? 'bg-red-100 text-red-850 border border-red-200'
+                              : vendor.isVerified 
+                              ? 'bg-green-100 text-green-850 border border-green-200' 
+                              : 'bg-orange-100 text-orange-850 border border-orange-200'
                           }`}>
-                            {vendor.isVerified ? 'VERIFIED' : 'PENDING'}
+                            {vendor.isFlagged ? 'FLAGGED' : vendor.isVerified ? 'VERIFIED' : 'PENDING'}
                           </span>
                         </div>
 
@@ -1846,23 +1915,56 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ vendors, setVendors, on
 
                     <div className="flex justify-between text-xs font-bold py-1.5">
                       <span className="text-gray-400">Licensing status</span>
-                      <span className={activeInspectorVendor.isVerified ? "text-green-600" : "text-orange-500"}>
-                        {activeInspectorVendor.isVerified ? "Approved Cert" : "On Hold / Pending"}
+                      <span className={activeInspectorVendor.isFlagged ? "text-red-650 font-black" : activeInspectorVendor.isVerified ? "text-green-600 font-black" : "text-amber-500 font-black"}>
+                        {activeInspectorVendor.isFlagged ? "Flagged (Compliance Audit)" : activeInspectorVendor.isVerified ? "Approved Cert / Verified" : "On Hold / Pending"}
                       </span>
                     </div>
                   </div>
 
-                  {/* Manual Approval Action */}
-                  <button 
-                    onClick={() => handleToggleVerification(activeInspectorVendor.id!)}
-                    className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
-                      activeInspectorVendor.isVerified 
-                        ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white' 
-                        : 'bg-green-600 text-white shadow-lg shadow-green-600/25 hover:bg-green-700'
-                    }`}
-                  >
-                    {activeInspectorVendor.isVerified ? t('ডিক্ৰী বাতিল কৰক', 'Revoke Vendor Approval') : t('অনুমোদন কৰক', 'Verify & Issue Certificate')}
-                  </button>
+                  {/* Manual Status Modification Actions */}
+                  <div className="mt-6 pt-5 border-t border-gray-100 space-y-3.5">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Update Registry Status</p>
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {/* 1. Verified & Approved */}
+                      <button 
+                        onClick={() => handleUpdateVerificationStatus(activeInspectorVendor.id!, 'verified')}
+                        className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center space-x-2 border cursor-pointer ${
+                          activeInspectorVendor.isVerified && !activeInspectorVendor.isFlagged
+                            ? 'bg-green-600 text-white border-green-600 shadow-lg shadow-green-600/20 hover:bg-green-700' 
+                            : 'bg-white text-green-700 hover:bg-green-50 border-green-200'
+                        }`}
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>{t('অনুমোদন কৰক (Approve)', 'Approve & Verify')}</span>
+                      </button>
+
+                      {/* 2. Pending */}
+                      <button 
+                        onClick={() => handleUpdateVerificationStatus(activeInspectorVendor.id!, 'pending')}
+                        className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center space-x-2 border cursor-pointer ${
+                          !activeInspectorVendor.isVerified && !activeInspectorVendor.isFlagged
+                            ? 'bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/10 hover:bg-amber-600' 
+                            : 'bg-white text-amber-600 hover:bg-amber-50 border-amber-200'
+                        }`}
+                      >
+                        <Clock className="w-4 h-4" />
+                        <span>{t('পেন্ডিং কৰক (Pending)', 'Set Pending / Hold')}</span>
+                      </button>
+
+                      {/* 3. Flagged */}
+                      <button 
+                        onClick={() => handleUpdateVerificationStatus(activeInspectorVendor.id!, 'flagged')}
+                        className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center space-x-2 border cursor-pointer ${
+                          activeInspectorVendor.isFlagged
+                            ? 'bg-red-600 text-white border-red-600 shadow-lg shadow-red-600/20 hover:bg-red-700' 
+                            : 'bg-white text-red-600 hover:bg-red-50 border-red-200'
+                        }`}
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                        <span>{t('চিহ্নিত কৰক (Flag)', 'Flag Non-Compliant')}</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Right side: Complete profile fields inspect */}

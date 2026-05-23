@@ -1,12 +1,18 @@
 
 import React from 'react';
-import { ShoppingBag, Truck, Calendar, Store } from 'lucide-react';
+import { ShoppingBag, Truck, Calendar, Store, Coffee, Flower, Scissors, Hammer } from 'lucide-react';
 import { Scheme } from './types';
 
 export const BUSINESS_TYPES = [
   { id: 'fixed', label: 'স্থায়ী দোকান (Fixed Shop)', icon: <Store className="w-8 h-8" /> },
   { id: 'mobile', label: 'ঠেলা গাড়ী (Mobile Cart)', icon: <Truck className="w-8 h-8" /> },
   { id: 'seasonal', label: 'ঋতুভিত্তিক বিক্ৰেতা (Seasonal)', icon: <Calendar className="w-8 h-8" /> },
+  { id: 'food', label: 'চাহ আৰু খাদ্য ষ্টল (Tea & Food Stall)', icon: <Coffee className="w-8 h-8" /> },
+  { id: 'textiles', label: 'কাপোৰ আৰু বস্ত্ৰ বিক্ৰেতা (Apparel & Textiles)', icon: <ShoppingBag className="w-8 h-8" /> },
+  { id: 'agriculture', label: 'ফল-মূল আৰু শাক-পাচলি (Fruits & Vegetables)', icon: <Store className="w-8 h-8" /> },
+  { id: 'florist', label: 'ফুল আৰু পূজাৰ সামগ্রী (Florist & Puja Items)', icon: <Flower className="w-8 h-8" /> },
+  { id: 'services', label: 'মেৰামতি আৰু কাৰিকৰী সেৱা (Repair & Technical Services)', icon: <Scissors className="w-8 h-8" /> },
+  { id: 'handicrafts', label: 'হস্তশিল্প আৰু কুটিৰ উদ্যোগ (Handicrafts & Cottage Industry)', icon: <Hammer className="w-8 h-8" /> },
   { id: 'small_scale', label: 'ক্ষুদ্ৰ উদ্যোগ (MSME/Small Scale)', icon: <ShoppingBag className="w-8 h-8" /> },
 ];
 
