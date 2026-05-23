@@ -29,6 +29,7 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
     mobile: '',
     aadharNumber: '',
     businessType: '',
+    profession: '',
     vendingType: 'fixed',
     location: { lat: 0, lng: 0, address: '' },
     activeSchemes: [],
@@ -237,6 +238,7 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
             mobile: mobile,
             aadharNumber: profile.aadharNumber || '',
             businessType: profile.businessType || '',
+            profession: profile.profession || '',
             location: profile.location || { lat: 0, lng: 0, address: '' },
             vendingType: profile.vendingType || 'fixed',
             selfie: selfie,
@@ -497,6 +499,35 @@ const Registration: React.FC<RegistrationProps> = ({ onComplete }) => {
                             value={profile.dob || ''}
                             onChange={(e) => setProfile({...profile, dob: e.target.value})}
                           />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 block mb-1">
+                          {t('ব্যৱসায়ৰ প্ৰকাৰ / উপজীৱিকা', 'Profession / Specific Trade (e.g. Tea Vendor, Weaver, Vegetable Seller)', 'पेशा या व्यवसाय (जैसे: चाय की दुकान, बुनकर, सब्जी विक्रेता)')}
+                        </label>
+                        <input 
+                          type="text"
+                          placeholder={t("পেশা লিখক (যেনে: শাক-পাচলি বিক্ৰেতা, চাহৰ দোকান)", "Write profession (e.g. Vegetable Seller, Tea Stall)", "पेशा लिखें (जैसे: सब्जी विक्रेता, चाय की दुकान)")}
+                          className="w-full p-4 sm:p-5 bg-gray-50 border-3 border-transparent rounded-[20px] focus:bg-white focus:border-orange-500 transition-all font-bold text-sm sm:text-base shadow-sm"
+                          value={profile.profession || ''}
+                          onChange={(e) => setProfile({...profile, profession: e.target.value})}
+                        />
+                        <div className="flex flex-wrap gap-2 mt-2 ml-1">
+                          {['ফল বিক্ৰেতা (Fruit Vendor)', 'শাক-পাচli বিক্ৰেতা (Vegetable Seller)', 'চাহ দোকান (Tea Stall)', 'বয়ন শিল্পী (Textiles Weaver)', 'ফাষ্ট ফুড (Fast Food)'].map((p) => (
+                            <button
+                              key={p}
+                              type="button"
+                              onClick={() => setProfile({...profile, profession: p})}
+                              className={`text-[9px] font-black px-2.5 py-1.5 rounded-full border transition-all ${
+                                profile.profession === p
+                                  ? 'bg-orange-600 text-white border-orange-600'
+                                  : 'bg-white text-gray-500 border-gray-200 hover:border-orange-200 hover:text-orange-600'
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          ))}
                         </div>
                       </div>
 

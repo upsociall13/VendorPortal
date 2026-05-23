@@ -6,9 +6,10 @@ import { useLanguage } from '../App';
 
 interface HomeProps {
   onStart: () => void;
+  onViewDashboard: () => void;
 }
 
-const Home: React.FC<HomeProps> = ({ onStart }) => {
+const Home: React.FC<HomeProps> = ({ onStart, onViewDashboard }) => {
   const { lang, t } = useLanguage();
 
   const visionPillars = [
@@ -92,9 +93,10 @@ const Home: React.FC<HomeProps> = ({ onStart }) => {
                   <ArrowRight className="ml-4 w-7 h-7 group-hover:translate-x-2 transition-transform" />
                 </button>
                 <button 
+                  onClick={onViewDashboard}
                   className="inline-flex items-center justify-center px-12 py-7 bg-white text-gray-900 rounded-[32px] font-black text-2xl border-2 border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition-all shadow-sm"
                 >
-                  {t('আঁচনিসমূহ চাওক', 'View Schemes')}
+                  {t('ড্যাশবৰ্ড', 'Dashboard')}
                 </button>
               </div>
             </div>

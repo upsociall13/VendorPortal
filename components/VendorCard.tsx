@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { 
   QrCode, 
   CheckCircle, 
@@ -119,7 +120,21 @@ const VendorCard: React.FC<VendorCardProps> = ({ profile }) => {
 
   return (
     <>
-      <div className="w-full max-w-sm mx-auto bg-white rounded-[64px] shadow-[0_60px_120px_-20px_rgba(249,115,22,0.18)] overflow-hidden border border-gray-100 relative group/card transition-all duration-700 hover:shadow-[0_80px_160px_-25px_rgba(249,115,22,0.25)]">
+      <motion.div 
+        className="w-full max-w-sm mx-auto bg-white rounded-[64px] shadow-[0_60px_120px_-20px_rgba(249,115,22,0.18)] overflow-hidden border border-gray-100 relative group/card transition-all duration-700 hover:shadow-[0_80px_160px_-25px_rgba(249,115,22,0.25)]"
+        animate={{
+          y: [0, -10, 0]
+        }}
+        transition={{
+          duration: 4.5,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        whileHover={{
+          scale: 1.015,
+          transition: { duration: 0.4, ease: "easeOut" }
+        }}
+      >
         
         {/* PASS-STYLE HEADER */}
         <div className="bg-gradient-to-br from-[#E65100] via-[#F57C00] to-[#FF9800] h-48 p-10 flex justify-between items-start text-white relative">
@@ -180,11 +195,52 @@ const VendorCard: React.FC<VendorCardProps> = ({ profile }) => {
                <div className="bg-white/80 px-3 py-1 rounded-xl text-[9px] font-black border border-white shadow-sm">{loanInfo.grade}</div>
              </div>
              <div className="relative pt-1">
-                <div className="w-full bg-gray-200/40 h-2.5 rounded-full overflow-hidden shadow-inner border border-white/50">
-                   <div 
-                      className={`h-full transition-all duration-[2000ms] ease-out rounded-full ${loanInfo.indicator} shadow-sm`}
-                      style={{ width: animateProgress ? `${loanInfo.progress}%` : '0%' }}
-                   ></div>
+                <div className="w-full bg-gray-200/40 h-2.5 rounded-full overflow-hidden shadow-inner border border-white/50 relative">
+                   <motion.div 
+                      className={`h-full rounded-full ${loanInfo.indicator} shadow-sm relative`}
+                      initial={{ width: '0%' }}
+                      animate={{ width: animateProgress ? `${loanInfo.progress}%` : '0%' }}
+                      transition={{ 
+                        type: 'spring', 
+                        stiffness: loanStatus === 'approved' ? 45 : 70, 
+                        damping: 14, 
+                        mass: 1.1 
+                      }}
+                   >
+                     {/* Smooth animated sheen and pulse effect for successful approved state (reached 100%) */}
+                     {loanStatus === 'approved' && animateProgress && (
+                       <>
+                         <motion.div 
+                           className="absolute inset-0 bg-white/40 rounded-full"
+                           style={{ originX: 0 }}
+                           animate={{ 
+                             x: ['-100%', '100%']
+                           }}
+                           transition={{ 
+                             repeat: Infinity, 
+                             duration: 2, 
+                             ease: 'linear' 
+                           }}
+                         />
+                         <motion.div 
+                           className="absolute inset-0 bg-white/30 rounded-full"
+                           animate={{ 
+                             opacity: [0.2, 0.7, 0.2]
+                           }}
+                           transition={{ 
+                             repeat: Infinity, 
+                             duration: 1.5, 
+                             ease: 'easeInOut' 
+                           }}
+                         />
+                         <motion.span 
+                           className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                           animate={{ scale: [1, 1.8, 1] }}
+                           transition={{ repeat: Infinity, duration: 1.5 }}
+                         />
+                       </>
+                     )}
+                   </motion.div>
                 </div>
              </div>
           </div>
@@ -227,7 +283,7 @@ const VendorCard: React.FC<VendorCardProps> = ({ profile }) => {
              </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* MODAL: FULL QR VIEW */}
       {isQrModalOpen && (

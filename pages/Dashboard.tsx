@@ -370,10 +370,104 @@ const Dashboard: React.FC<DashboardProps> = ({ profile }) => {
         <div className="lg:col-span-8 space-y-16">
           <div className="relative">
             <div className="absolute -left-12 top-1/2 -translate-y-1/2 w-1 h-12 bg-orange-500 rounded-full hidden md:block"></div>
-            <h1 className="text-5xl font-black text-gray-900 mb-4 tracking-tighter">{t(`নমস্কাৰ, ${profile.name}!`, `Welcome, ${profile.name}!`)}</h1>
+            <h1 className="text-5xl font-black text-gray-900 mb-4 tracking-tighter">{t('আধিকাৰিক ডেশ্বব’ৰ্ড', 'Officer Dashboard')}</h1>
             <p className="text-xl text-gray-500 font-medium max-w-2xl leading-relaxed">
-              {t('ক্ষুদ্ৰ ব্যৱসায় সশক্তিকৰণ আঁচনিৰ ডেশ্বব’ৰ্ডত আপোনাক আদৰণি জনাইছোঁ। আপোনাৰ ক্ষুদ্ৰ উদ্যোগৰ সৰ্বাংগীণ বৃদ্ধিৰ বাবে সকলো চৰকাৰী সুবিধা উপলব্ধ কৰা হৈছে।', 'Welcome to the Assam Small Business Empowerment Dashboard. All government facilities for your micro-enterprise growth are available here.')}
+              {t('অসম চৰকাৰৰ ক্ষুদ্ৰ ব্যৱসায় পৰিদৰ্শন কন্স’ল। পঞ্জীয়নভুক্ত ব্যৱসায়ীসকলৰ সবিশেষ তথ্য ইয়াতে পৰীক্ষা কৰিব পাৰিব।', 'Assam Govt Small Business Inspection Console. View and audit all verified enterprise records and profile details here.')}
             </p>
+          </div>
+
+          {/* Official Registration Profile Details Card */}
+          <div className="bg-white rounded-[48px] border border-orange-100 p-10 shadow-sm relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/[0.02] rounded-full -mr-24 -mt-24 pointer-events-none"></div>
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="w-12 h-12 bg-orange-50/80 rounded-2xl flex items-center justify-center text-orange-600 border border-orange-100 shadow-inner">
+                <ShieldCheck className="w-6 h-6 animate-pulse" />
+              </div>
+              <div className="text-left">
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+                  {t('আধিকাৰিক ডেশ্বব’ৰ্ড: পঞ্জীয়নৰ সবিশেষ', 'Officer Dashboard: Registration Profile')}
+                </h2>
+                <p className="text-xs text-gray-400 font-bold tracking-wider uppercase">
+                  {t('অসম চৰকাৰৰ অনুমোদিত তথ্যকোষ', 'Assam Government Authorized Records')}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+              {/* Name */}
+              <div className="space-y-1 bg-gray-50/50 p-6 rounded-3xl border border-gray-100/50 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{t('নাম', 'Name')}</span>
+                <span className="text-lg font-black text-gray-900 block font-sans">{profile.name}</span>
+              </div>
+
+              {/* Registration ID */}
+              <div className="space-y-1 bg-gray-50/50 p-6 rounded-3xl border border-gray-100/50 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{t('পঞ্জীয়ন নম্বৰ', 'Registration ID')}</span>
+                <span className="text-lg font-black text-orange-600 block font-mono">
+                  {profile.id || `ASM-REG${profile.aadharNumber ? profile.aadharNumber.slice(-4) : "8091"}`}
+                </span>
+              </div>
+
+              {/* Professional Category */}
+              <div className="space-y-1 bg-gray-50/50 p-6 rounded-3xl border border-gray-100/50 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{t('বৃত্তিৰ তালিকা', 'Professional Category')}</span>
+                <span className="text-lg font-black text-gray-700 block font-sans">
+                  {profile.profession || profile.businessType || t('ক্ষুদ্ৰ উদ্যোক্তা', 'Micro-entrepreneur')}
+                </span>
+              </div>
+
+              {/* Registration Status */}
+              <div className="space-y-1 bg-gray-50/50 p-6 rounded-3xl border border-gray-100/50 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{t('পঞ্জীয়নৰ স্থিতি', 'Registration Status')}</span>
+                <div className="flex items-center space-x-2.5 mt-1">
+                  <span className={`flex h-2.5 w-2.5 rounded-full ${profile.isVerified ? 'bg-green-500 animate-pulse' : 'bg-amber-500 animate-pulse'}`}></span>
+                  <span className={`text-md font-black uppercase tracking-widest ${profile.isVerified ? 'text-green-700' : 'text-amber-700'}`}>
+                    {profile.isVerified ? t('অনুমোদিত', 'Approved') : t('পৰীক্ষাধীন', 'Review Mode')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Aadhaar Card (Masked) */}
+              <div className="space-y-1 bg-gray-50/50 p-6 rounded-3xl border border-gray-100/50 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{t('আধাৰ কাৰ্ড', 'Aadhaar Card (Masked)')}</span>
+                <span className="text-lg font-black text-gray-700 block font-mono">
+                  {profile.aadharNumber 
+                    ? `XXXX-XXXX-${profile.aadharNumber.slice(-4)}` 
+                    : 'XXXX-XXXX-8091'}
+                </span>
+              </div>
+
+              {/* Masked Address */}
+              <div className="space-y-1 bg-gray-50/50 p-6 rounded-3xl border border-gray-100/50 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{t('ঠিকনা', 'Masked Address')}</span>
+                <span className="text-[15px] font-bold text-gray-750 block font-sans leading-snug">
+                  {profile.location?.address 
+                    ? (() => {
+                        const addr = profile.location.address;
+                        const parts = addr.split(',');
+                        if (parts.length > 1) {
+                          return `••••••••, ${parts.slice(1).join(',').trim()}`;
+                        }
+                        return `••••••••, ${addr}`;
+                      })()
+                    : '••••••••, Fancy Bazar, Guwahati'}
+                </span>
+              </div>
+
+              {/* District */}
+              <div className="space-y-1 bg-gray-50/50 p-6 rounded-3xl border border-gray-100/50 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{t('জিলা', 'District')}</span>
+                <span className="text-lg font-black text-gray-900 block font-sans">
+                  {profile.location?.address?.split(',').slice(-2, -1)[0]?.trim() || t('কামৰূপ মহানগৰ', 'Kamrup Metropolitan')}
+                </span>
+              </div>
+
+              {/* State */}
+              <div className="space-y-1 bg-orange-50/20 p-6 rounded-3xl border border-orange-100/30 hover:bg-white hover:shadow-md hover:border-orange-100 transition-all">
+                <span className="text-[10px] font-black text-orange-600 uppercase tracking-widest block">{t('ৰাজ্য', 'State')}</span>
+                <span className="text-lg font-black text-orange-700 block font-sans">{t('অসম', 'Assam')}</span>
+              </div>
+            </div>
           </div>
 
           {/* Redesigned Dashboard Stats / Indicators */}

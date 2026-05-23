@@ -5,9 +5,11 @@ import { useLanguage } from '../App';
 
 interface LayoutProps {
   children: React.ReactNode;
+  currentView?: string;
+  onNavigate?: (view: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, currentView, onNavigate }) => {
   const { lang, setLang, t } = useLanguage();
 
   return (
@@ -15,7 +17,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Header */}
       <header className="bg-white border-b border-orange-100 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div 
+            onClick={() => onNavigate && onNavigate('home')}
+            className="flex items-center space-x-4 cursor-pointer hover:opacity-90 active:scale-[0.98] transition-all"
+          >
             <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-orange-200">
               AS
             </div>
@@ -28,15 +33,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
           
           <nav className="hidden lg:flex items-center space-x-10 text-sm font-black uppercase tracking-widest text-gray-600">
-            <a href="#" className="hover:text-orange-600 transition-colors border-b-2 border-transparent hover:border-orange-600 pb-1">
+            <button 
+              onClick={() => onNavigate && onNavigate('home')}
+              className={`hover:text-orange-600 transition-colors border-b-2 border-transparent pb-1 font-black uppercase tracking-widest cursor-pointer ${currentView === 'home' ? 'text-orange-600 border-orange-600' : ''}`}
+            >
               {t('মূল পৃষ্ঠা', 'Home')}
-            </a>
-            <a href="#" className="hover:text-orange-600 transition-colors border-b-2 border-transparent hover:border-orange-600 pb-1">
+            </button>
+            <button 
+              onClick={() => onNavigate && onNavigate('admin')}
+              className={`hover:text-orange-600 transition-colors border-b-2 border-transparent pb-1 font-black uppercase tracking-widest cursor-pointer ${currentView === 'admin' ? 'text-orange-600 border-orange-600' : ''}`}
+            >
+              {t('ড্যাশবৰ্ড', 'Dashboard')}
+            </button>
+            <button 
+              onClick={() => {
+                onNavigate && onNavigate('home');
+                setTimeout(() => {
+                  document.getElementById('schemes')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+              className="hover:text-orange-600 transition-colors border-b-2 border-transparent hover:border-orange-600 pb-1 font-black uppercase tracking-widest cursor-pointer"
+            >
               {t('আঁচনিসমূহ', 'Schemes')}
-            </a>
-            <a href="#" className="hover:text-orange-600 transition-colors border-b-2 border-transparent hover:border-orange-600 pb-1">
+            </button>
+            <button 
+              onClick={() => {
+                onNavigate && onNavigate('home');
+                setTimeout(() => {
+                  document.getElementById('testimonials')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+              className="hover:text-orange-600 transition-colors border-b-2 border-transparent hover:border-orange-600 pb-1 font-black uppercase tracking-widest cursor-pointer"
+            >
               {t('সহায়', 'Help')}
-            </a>
+            </button>
           </nav>
 
           <div className="flex items-center space-x-6">
@@ -47,12 +77,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${lang === 'as' ? 'bg-white text-orange-600 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
               >
                 অসমীয়া
-              </button>
-              <button 
-                onClick={() => setLang('hi')}
-                className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${lang === 'hi' ? 'bg-white text-orange-600 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
-              >
-                हिन्दी
               </button>
               <button 
                 onClick={() => setLang('en')}
@@ -66,8 +90,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <ShieldCheck className="w-4 h-4" />
               <span>{t('সুৰক্ষিত', 'Secure')}</span>
             </div>
-            <button className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center hover:bg-orange-50 hover:border-orange-200 transition-all">
-              <User className="w-6 h-6 text-gray-600" />
+            
+            <button 
+              onClick={() => onNavigate && onNavigate('admin')}
+              className={`px-4 h-12 rounded-2xl border flex items-center justify-center space-x-2 transition-all cursor-pointer font-black text-[10px] uppercase tracking-widest ${
+                currentView === 'admin'
+                  ? 'bg-orange-600 text-white border-orange-600 shadow-lg shadow-orange-100'
+                  : 'bg-orange-50/70 border-orange-100 text-orange-600 hover:bg-orange-100'
+              }`}
+            >
+              <User className="w-4 h-4 shrink-0" />
+              <span>{t('বিষয়া প্রৱেশ', 'Officer Login')}</span>
             </button>
           </div>
         </div>

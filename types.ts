@@ -1,5 +1,5 @@
 
-export type Language = 'as' | 'en' | 'hi';
+export type Language = 'as' | 'en';
 
 export enum RegistrationStep {
   AUTH = 'AUTH',
@@ -20,6 +20,7 @@ export interface VendorProfile {
   mobile: string;
   aadharNumber: string;
   businessType: string;
+  profession?: string;
   location: {
     lat: number;
     lng: number;
