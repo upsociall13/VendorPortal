@@ -1,0 +1,11 @@
+{
+  "name": "Assam Small Business Registration Portal",
+  "description": "A flagship, CM-grade digital experience for vendor registration in Assam, focusing on dignity, ease of use, and economic empowerment.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
